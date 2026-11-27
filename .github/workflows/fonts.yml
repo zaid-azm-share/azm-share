@@ -9,6 +9,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - name: Download fonts
         run: |
@@ -16,8 +17,19 @@ jobs:
           seq -f "%03g" 1 604 | xargs -P 8 -I{} curl -sfL --retry 4 -o f/QCF2{}.ttf https://tbntlijruhhqqnvowpbx.supabase.co/storage/v1/object/public/qcf/QCF2{}.ttf
           test "$(ls f | wc -l)" = "604"
           du -sh f
-      - name: Release
+      - name: Release (throttled, resumable)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create fonts-v1 f/*.ttf --repo "$GITHUB_REPOSITORY" --title "Mushaf page fonts v1" --notes "KFGQPC QCF2 page fonts, one per mushaf page"
+          gh release view fonts-v1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create fonts-v1 --repo "$GITHUB_REPOSITORY" --title "Mushaf page fonts v1" --notes "KFGQPC QCF2 page fonts, one per mushaf page"
+          for file in f/*.ttf; do
+            n=$(basename "$file")
+            for try in 1 2 3 4 5 6 7 8; do
+              have=$(gh release view fonts-v1 --repo "$GITHUB_REPOSITORY" --json assets --jq "[.assets[]|select(.name==\"$n\" and .state==\"uploaded\")]|length" 2>/dev/null || echo 0)
+              if [ "$have" = "1" ]; then break; fi
+              gh release upload fonts-v1 "$file" --clobber --repo "$GITHUB_REPOSITORY" && break
+              sleep $((try * 20))
+            done
+            sleep 2
+          done
+          gh release view fonts-v1 --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets|length'
