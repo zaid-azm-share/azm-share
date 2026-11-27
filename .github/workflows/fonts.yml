@@ -1,0 +1,23 @@
+name: publish-mushaf-fonts
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fonts.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download fonts
+        run: |
+          mkdir f
+          seq -f "%03g" 1 604 | xargs -P 8 -I{} curl -sfL --retry 4 -o f/QCF2{}.ttf https://tbntlijruhhqqnvowpbx.supabase.co/storage/v1/object/public/qcf/QCF2{}.ttf
+          test "$(ls f | wc -l)" = "604"
+          du -sh f
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create fonts-v1 f/*.ttf --repo "$GITHUB_REPOSITORY" --title "Mushaf page fonts v1" --notes "KFGQPC QCF2 page fonts, one per mushaf page"
