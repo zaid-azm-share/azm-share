@@ -1,0 +1,24 @@
+name: mirror-apk
+on:
+  push:
+    paths:
+      - 'apk.json'
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror the APK as a release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url=$(jq -r .url apk.json)
+          vc=$(jq -r .versionCode apk.json)
+          curl -sfL --retry 4 -o azm.apk "$url"
+          ls -l azm.apk
+          unzip -tq azm.apk
+          gh release view "apk-v$vc" >/dev/null 2>&1 || gh release create "apk-v$vc" --title "Azm APK versionCode $vc" --notes "Mirror of the build linked in apk.json"
+          gh release upload "apk-v$vc" azm.apk --clobber
