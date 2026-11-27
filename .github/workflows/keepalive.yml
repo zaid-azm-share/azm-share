@@ -1,0 +1,13 @@
+name: keepalive
+on:
+  schedule:
+    - cron: '17 6 * * 1,4'
+  workflow_dispatch:
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the database so the free project is not paused for inactivity
+        run: |
+          curl -sf --retry 3 -X POST "https://tbntlijruhhqqnvowpbx.supabase.co/rest/v1/rpc/community_status" -H "apikey: sb_publishable_kUmgvXt5xVDq-5WQT_itDA_3wpshuAi" -H "Authorization: Bearer sb_publishable_kUmgvXt5xVDq-5WQT_itDA_3wpshuAi" -H "Content-Type: application/json" -d '{}'
