@@ -31,7 +31,7 @@ var id=(new URLSearchParams(location.search).get('id')||'').trim();
 var ok=/^[0-9a-f-]{36}$/i.test(id);
 var o=document.getElementById('o'),c=document.getElementById('c');
 if(ok){o.href=/Android/i.test(navigator.userAgent)?'intent://post?id='+id+'#Intent;scheme=azm;package=app.azm.mobile;end':'azm://post?id='+id;}
-fetch('apk.json?'+Date.now()).then(function(r){return r.json();}).then(function(j){var d=document.getElementById('d'),a=document.getElementById('alt');if(!j||!j.url)return;var m='https://github.com/zaid-azm-share/azm-share/releases/download/apk-v'+j.versionCode+'/azm.apk';d.href=j.url;a.href=m;a.style.display='inline';var t=new AbortController();var tm=setTimeout(function(){t.abort();},6000);fetch(j.url,{method:'HEAD',mode:'no-cors',signal:t.signal}).then(function(){clearTimeout(tm);}).catch(function(){d.href=m;});}).catch(function(){});
+fetch('apk.json?'+Date.now()).then(function(r){return r.json();}).then(function(j){var d=document.getElementById('d'),a=document.getElementById('alt');if(!j||!j.url)return;var m='https://github.com/zaid-azm-share/azm-share/releases/download/apk-v'+j.versionCode+'/azm.apk';d.href=m;a.href=j.url;a.style.display='inline';var t=new AbortController();var tm=setTimeout(function(){t.abort();},6000);fetch(m,{method:'HEAD',mode:'no-cors',signal:t.signal}).then(function(){clearTimeout(tm);}).catch(function(){d.href=j.url;});}).catch(function(){});
 function msg(t){c.className='m';c.textContent=t;}
 function render(p){
   var card=document.createElement('div');card.className='card';
