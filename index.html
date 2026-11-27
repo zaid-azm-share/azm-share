@@ -22,6 +22,7 @@ small{display:block;text-align:center;color:#888;margin-top:14px}
 <div id="c" class="m">جاري التحميل...</div>
 <a class="btn" id="d" href="https://expo.dev/artifacts/eas/dud5PyOVkAyP8ZCjAJJcDnU41zPkuW_nCWhisuuRyE8.apk">حمّل التطبيق</a>
 <small>أندرويد فقط. بعد التحميل افتح الملف وثبّته.</small>
+<small><a id="alt" href="#" style="color:#0F4D3A;display:none">لو التحميل ما اشتغلش، جرّب الرابط البديل</a></small>
 <small><a id="o" href="#" style="color:#0F4D3A">عندي التطبيق، افتحه</a></small>
 </div>
 <script>
@@ -30,7 +31,7 @@ var id=(new URLSearchParams(location.search).get('id')||'').trim();
 var ok=/^[0-9a-f-]{36}$/i.test(id);
 var o=document.getElementById('o'),c=document.getElementById('c');
 if(ok){o.href=/Android/i.test(navigator.userAgent)?'intent://post?id='+id+'#Intent;scheme=azm;package=app.azm.mobile;end':'azm://post?id='+id;}
-fetch('apk.json?'+Date.now()).then(function(r){return r.json();}).then(function(j){if(j&&j.url)document.getElementById('d').href=j.url;}).catch(function(){});
+fetch('apk.json?'+Date.now()).then(function(r){return r.json();}).then(function(j){var d=document.getElementById('d'),a=document.getElementById('alt');if(!j||!j.url)return;var m='https://github.com/zaid-azm-share/azm-share/releases/download/apk-v'+j.versionCode+'/azm.apk';d.href=j.url;a.href=m;a.style.display='inline';var t=new AbortController();var tm=setTimeout(function(){t.abort();},6000);fetch(j.url,{method:'HEAD',mode:'no-cors',signal:t.signal}).then(function(){clearTimeout(tm);}).catch(function(){d.href=m;});}).catch(function(){});
 function msg(t){c.className='m';c.textContent=t;}
 function render(p){
   var card=document.createElement('div');card.className='card';
